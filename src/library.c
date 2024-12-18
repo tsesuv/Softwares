@@ -156,30 +156,30 @@ dllexp void twss(int *p, int l)
     英語では「Two Way Selection Sort」になったため、関数名をtwssとさせていただきました。
     なお、既存のプログラムでの利用でエラーが起きないよう、
     sort関数ではtwssを呼び出すよう変更しております。 */
-	int tmp; // 値のコピー用
-	int i = 0;
-	int k = l - 1;
+    int tmp; // 値のコピー用
+    int i = 0;
+    int k = l - 1;
 
-	while(1)
-	{
-		if(*(p + i) > *(p + k))
-		{
-			tmp = *(p + i);
-			*(p + i) = *(p + k);
-			*(p + k) = tmp;
-		}
-		k--;
+    while(1)
+    {
+        if(*(p + i) > *(p + k))
+        {
+            tmp = *(p + i);
+            *(p + i) = *(p + k);
+            *(p + k) = tmp;
+        }
+        k--;
 
-		if(i == k)
-		{
-			i++;
-			k = l - 1;
-		}
-		if(i == l - 1)
-		{
-			return;
-		}
-	}
+        if(i == k)
+        {
+            i++;
+            k = l - 1;
+        }
+        if(i == l - 1)
+        {
+            return;
+        }
+    }
 }
 
 dllexp void sort(int *p, int l)
@@ -202,7 +202,7 @@ dllexp void msgtype(int tablenum)
         puts("\e[41m[\e[38m ERROR ]\e[0m ");
         break;
     case 3:
-        puts("\e[43m[\e[30m WORNING ]\e[0m ");
+        puts("\e[43m[\e[30m WARNING ]\e[0m "); /* 2024/12/19/06:07:スペルミス発覚。どんなミスしてんねん。 */
         break;
     case 4:
         puts("\e[44m[\e[30m DEBUG ]\e[0m ");
