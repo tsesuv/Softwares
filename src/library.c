@@ -10,6 +10,7 @@ dllexp char* rewrite(char *p, int l, int i, char d, char res_list[])
     /* 2024/12/07/12:49:入力配列pを破壊しないように変更しました */
     for (int j = 0; j < l; j++)
     {
+        res_list[j] = *(p + j); /* 2024/12/19/09:40:バグが会ったので修正 */
         if(j == i)
         {
             res_list[j] = d;
