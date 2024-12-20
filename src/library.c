@@ -1,3 +1,5 @@
+(英語できないんで日本語でどうぞ。あと批判指摘注意等は受け付けてないんで。言われなくてもわかってるんでね？わざわざ言わないでくださいね？なおバージョンは1.0.3です。Githubにも上げてます。)
+```library.c
 #ifdef _WIN32
 #define dllexp extern __declspec(dllexport)
 #else
@@ -199,6 +201,7 @@ dllexp int lhash(char *p, int l)
     {
         res[i] = (int)res % ((int)*(p + i) - (int)res[i - 1]) + (int)*(p + i); 
     }
+    return res;
 }
 
 dllexp void msgtype(int tablenum)
@@ -226,3 +229,4 @@ dllexp void msgtype(int tablenum)
     }
     return;
 }
+```
