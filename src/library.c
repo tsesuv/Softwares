@@ -189,6 +189,18 @@ dllexp void sort(int *p, int l)
     return;
 }
 
+dllexp int lhash(char *p, int l)
+{
+    /* 2024/12/19/21:18:実装。lはlikeのl。 */
+    int i = 0;
+    int res[] = {};
+
+    for(i = 0; i < l; i++)
+    {
+        res[i] = (int)res % ((int)*(p + i) - (int)res[i - 1]) + (int)*(p + i); 
+    }
+}
+
 dllexp void msgtype(int tablenum)
 {
     switch (tablenum)
