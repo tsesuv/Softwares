@@ -5,9 +5,14 @@
 #endif
 #include <stdio.h>
 
-dllexp char* rewrite(char *p, int l, int i, char d, char res_list[])
+char res_list[0xFFFF]; /* 2024/12/20/15:55:引数で変数を指定する方式から
+                       関数の返り値を使用する方式に変更するため、
+                       変数をグローバルとして宣言。65535文字までなら何とか。 */
+
+dllexp char* rewrite(char *p, int l, int i, char d)
 {
     /* 2024/12/07/12:49:入力配列pを破壊しないように変更しました */
+    
     for (int j = 0; j < l; j++)
     {
         res_list[j] = *(p + j); /* 2024/12/19/09:40:バグがあったので修正 */
@@ -19,9 +24,10 @@ dllexp char* rewrite(char *p, int l, int i, char d, char res_list[])
     return res_list;
 }
 
-dllexp char* trim(char *p, int l, int i, char res_list[])
+dllexp char* trim(char *p, int l, int i)
 {
-    /* 2024/12/07/12:49:入力配列pを破壊しないように変更しました */
+    /* 2024/12/07/12:49:入力配列pを破壊しないように変更しました */ 
+    
     for (int j = 0; j < l; j++)
     {
         if(i <= j)
@@ -43,7 +49,7 @@ dllexp char* trim(char *p, int l, int i, char res_list[])
     return res_list;
 }
 
-dllexp char* find(char *p, int l, char tgt ,char res_list[])
+dllexp char* find(char *p, int l, char tgt)
 {
     int j = 0;
     for(int i = 0; i < l; i++)
@@ -59,11 +65,11 @@ dllexp char* find(char *p, int l, char tgt ,char res_list[])
 
 /* 2024/12/06/21:24:old_splitは削除されました */
 
-dllexp char* split(char *p, int l, char dchar, int i, char res_list[])
+dllexp char* split(char *p, int l, char dchar, int i)
 {
-    
     int k = 0;
     int n = 0;
+     
     char tmp[l + 2];
 
     for(int ti = 0; ti < l; ti++)
@@ -101,22 +107,23 @@ dllexp char* split(char *p, int l, char dchar, int i, char res_list[])
             }
         }
     }
+    return res_list;
 }
 
-dllexp char* slice(char *p, int l, char si, int ei, char res_list[])
+dllexp char* slice(char *p, int l, int si, int ei)
 {
     char tmp[l + 2];
+
     for(int i = 0; i < l; i++)
     {
         tmp[i + 1] = *(p + i);
     }
     tmp[ei + 1] = '\0';
     tmp[si] = '\0';
-    split(&tmp[0], l, '\0', 1, &res_list[0]);
-    return res_list;
+    return split(&tmp[0], l, '\0', 1);
 }
 
-dllexp char* swap(char *p, int l, char res_list[])
+dllexp char* swap(char *p, int l)
 {
     for(int i = 0; i < l; i++)
     {
@@ -125,9 +132,10 @@ dllexp char* swap(char *p, int l, char res_list[])
     return res_list;
 }
 
-dllexp char* unique(char *p, int l, char res_list[])
+dllexp char* unique(char *p, int l)
 {
     int k = 0;
+
     for(int i = 0; i < l; i++)
     {
         /* 2024/12/06/21:21:修正完了。もともとのコードは消しました。 */
@@ -192,12 +200,14 @@ dllexp void sort(int *p, int l)
 dllexp int lhash(char *p, int l)
 {
     /* 2024/12/19/21:18:実装。lはlikeのl。 */
+    int res;
     int i = 0;
-    int res[] = {};
+    int tmp = 0;
 
     for(i = 0; i < l; i++)
     {
-        res[i] = (int)res % ((int)*(p + i) - (int)res[i - 1]) + (int)*(p + i); 
+        tmp = res % ((int)*(p + i) - tmp) + (int)*(p + i); 
+        res = res + tmp;
     }
     return res;
 }
