@@ -1,5 +1,3 @@
-(英語できないんで日本語でどうぞ。あと批判指摘注意等は受け付けてないんで。言われなくてもわかってるんでね？わざわざ言わないでくださいね？なおバージョンは1.0.3です。Githubにも上げてます。)
-```library.c
 #ifdef _WIN32
 #define dllexp extern __declspec(dllexport)
 #else
@@ -229,4 +227,3 @@ dllexp void msgtype(int tablenum)
     }
     return;
 }
-```
