@@ -1,4 +1,4 @@
-/* XMC Virtual Machine Version:1.0.11 Beta */
+/* XMC Virtual Machine Version:1.0.2 Master Release */
 /* XMC: Xross(Cross) Machine Code */
 #define K * 1024
 #define M K K
@@ -12,17 +12,15 @@
 #include <termios.h>
 #endif
 
-uint16_t pc = 0;
-uint8_t bp = 0;
-uint16_t sp = 0;
+uint16_t pc = 0, sp = 0;
 uint8_t memory[8 M - 1] = {0};
-uint8_t a = 0, b = 0, c = 0, d = 0, e = 0, f = 0, h = 0, l = 0;
+uint8_t a = 0, b = 0, c = 0, d = 0, e = 0, f = 0, h = 0, l = 0, bp = 0;
 FILE *infile;
 uint32_t FILESIZE = 0;
 
 void version()
 {
-	printf("XMC Virtual Machine Version:1.0.11 Beta\n");
+	printf("XMC Virtual Machine Version:1.0.2 Master Release\n");
 	printf("Created by vijeg dosmen(or aRefOOT2)\n");
 	printf("Enter 'xvm /?` you get more helps.\n");
 	exit(0);
@@ -53,29 +51,28 @@ void syscall(uint8_t number)
 			printf("%c", (char)d);
 			break;
 		case 3:
-			if((f & 0x80) == 1)
-			d = getchar();
-			else
-			{
-				if(kbhit())
-				d = getchar();
-			}
+			if(kbhit())
+			d = getch();
 			break;
 		case 4:
+			int tmp = d;
+			while(d == tmp){d = getch();};
+			break;
+		case 5:
 			while(1);
 			break;
 		default:
-			printf("Undefined syscall.\n");
+			printf("Undefined syscall: %X\n", number);
 			break;
 	}
 }
 
-void exec(uint8_t p[])
+void exec(uint8_t* p)
 {
 	volatile uint8_t NOP_COUNTER;
 	while(pc + (bp << 16) < 8 M)
 	{
-		switch(p[pc + (bp << 16)])
+		switch(*(p + pc + (bp << 16)))
 		{
 			case 0x00:
 				NOP_COUNTER = 0;
@@ -144,11 +141,11 @@ void exec(uint8_t p[])
 				e = d;
 				break;
 			case 0x15:
-				d = p[pc + (bp << 16) + 1];
+				d = *(p + pc + (bp << 16) + 1);
 				pc++;
 				break;
 			case 0x16:
-				e = p[pc + (bp << 16) + 1];
+				e = *(p + pc + (bp << 16) + 1);
 				pc++;
 				break;
 			case 0x17:
@@ -174,8 +171,8 @@ void exec(uint8_t p[])
 				e = l;
 				break;
 			case 0x1D:
-				h = p[pc + (bp << 16) + 2];
-				l = p[pc + (bp << 16) + 1];
+				h = *(p + pc + (bp << 16) + 2);
+				l = *(p + pc + (bp << 16) + 1);
 				pc += 2;
 				break;
 			case 0x1E:
@@ -531,6 +528,7 @@ void exec(uint8_t p[])
 				break;
 			case 0x5D:
 				f = (f || p[pc + (bp << 16)]) - (f && p[pc + (bp << 16)]);
+				pc++;
 				break;
 			case 0x5E:
 				if(b == p[pc + (bp << 16) + 1])
@@ -566,14 +564,14 @@ void exec(uint8_t p[])
 				pc++;
 				break;
 			case 0x63:
-				pc = (((p[pc + (bp << 16) + 3] << 4)) + p[pc + (bp << 16) + 2]);
+				pc = (((p[pc + (bp << 16) + 3] << 4)) + p[pc + (bp << 16) + 2]) + 1;
 				bp = p[pc + (bp << 16) + 1];
 				break;
 			case 0x64:
 				if(e && 0x80 == 0)
 				pc += e;
 				else
-				pc += ~(e) + 1;
+				pc += ~(e);
 				break;
 			case 0x65:
 				if(f && 0x01 == 0x01)
@@ -581,7 +579,7 @@ void exec(uint8_t p[])
 					if(e && 0x80 == 0)
 					pc += e;
 					else
-					pc += ~(e) + 1;
+					pc += ~(e);
 				}
 				break;
 			case 0x66:
@@ -590,7 +588,7 @@ void exec(uint8_t p[])
 					if(e && 0x80 == 0)
 					pc += e;
 					else
-					pc += ~(e) + 1;
+					pc += ~(e);
 				}
 				break;
 			case 0x67:
@@ -599,9 +597,8 @@ void exec(uint8_t p[])
 					if(e && 0x80 == 0)
 					pc += e;
 					else
-					pc += ~(e) + 1;
+					pc += ~(e);
 				}
-				pc++;
 				break;
 			case 0x68:
 				if((f && p[pc + (bp << 16) + 1]) == p[pc + (bp << 16) + 1])
@@ -609,9 +606,8 @@ void exec(uint8_t p[])
 					if(e && 0x80 == 0)
 					pc += e;
 					else
-					pc += ~(e) + 1;
+					pc += ~(e);
 				}
-				pc++;
 				break;
 			case 0x69:
 				sp++;
@@ -723,6 +719,9 @@ int main(int argc, char** argv)
 		FILESIZE++;
 	}
 	fclose(infile);
+	f = 0x80;
+	syscall(3);
+	syscall(2);
 	exec(memory);
 	return 0;
 }
