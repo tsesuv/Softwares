@@ -4,9 +4,11 @@
 #define dllexp /*extern __declspec(dllexport)*/
 #endif
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
 
-/*関数宣言*/
-dllexp char* rewrite(char *p, int l, int i, char d);
+/* 関数宣言 */
+dllexp char* rewrite(char *p, int i, char d);
 dllexp char* trim (char *p, int l, int i);
 dllexp char* find(char *p, int l, char tgt);
 dllexp char* split(char *p, int l, char dchar, int i);
@@ -16,26 +18,55 @@ dllexp char* unique(char *p, int l);
 dllexp void sort(int *p, int l);
 dllexp void twss(int *p, int l);
 dllexp int lhash(char *p, int l);
+dllexp uint8_t xor(uint8_t in1, uint8_t in2);
+dllexp uint8_t xed_enc(uint8_t p);
+dllexp uint8_t xed_dec(uint8_t p);
+dllexp unsigned int dec2bin(unsigned int p);
 dllexp void msgtype(int tablenum);
-/*2024/12/22/12:26:関数宣言部を作成。*/
+/* 2024/12/22/12:26:関数宣言部を作成。 */
 
 char res_list[0xFFFF] = "";; /* 2024/12/20/15:55:引数で変数を指定する方式から
 					   関数の返り値を使用する方式に変更するため、
 					   変数をグローバルとして宣言。65535文字までなら何とか。 */
 
-dllexp char* rewrite(char *p, int l, int i, char d)
+dllexp char* rewrite(char *p, int i, char d)
 {
 	/* 2024/12/07/12:49:入力配列pを破壊しないように変更しました */
 	
-	for (int j = 0; j < l; j++)
+	int memsize = 1;
+	char* nres_list = (char*)malloc(memsize); /* 2025/01/13/07:56:試験的に動的メモリを使用するようにしました。 */
+	if(!nres_list)
 	{
-		res_list[j] = *(p + j); /* 2024/12/19/09:40:バグがあったので修正 */
-		if(j == i)
+		free(nres_list);
+		return NULL;
+	}
+	int k = 0;
+	
+	while(*(p + k) != '\0')
+	{
+		*(nres_list + k) = *(p + k); /* 2024/12/19/09:40:バグがあったので修正 */
+		if(k == i)
 		{
-			res_list[j] = d;
+			*(nres_list + k) = d;
+		}
+		k++;
+
+		if(memsize <= k)
+		{
+			memsize++;
+			char* tmp = (char*)realloc(nres_list, memsize * sizeof(char*));
+			if(!tmp)
+			{
+				free(nres_list);
+				free(tmp);
+				return NULL;
+			}
+			
+			nres_list = tmp;
 		}
 	}
-	return res_list;
+	*(nres_list + k) = '\0';
+	return nres_list;
 }
 
 dllexp char* trim(char *p, int l, int i)
@@ -224,6 +255,110 @@ dllexp int lhash(char *p, int l)
 		res = res + tmp;
 	}
 	return res;
+}
+
+/* 2025/01/13/08:15:以下がXEA、正式名称をXor Encode/Decode Algorithmのエンコード・デコードアルゴリズム。 */
+/*
+エンコード：
+①インデックスiを0に初期化
+②入力バイナリはin配列で表現(in[0]は最上位ビット)
+③出力バイナリはout配列で表現(out[0]は最上位ビット)
+④in[0]をout[0]にロード
+⑤in[i]とin[i+1]のXORをout[i]にロード
+⑥iをインクリメント
+⑦i<(inのサイズ)であれば⑤に飛ぶ
+デコード：
+①インデックスiを1に初期化
+②入力バイナリはin配列で表現(in[0]は最上位ビット)
+③出力バイナリはout配列で表現(out[0]は最上位ビット)
+④in[0]をout[0]にロード
+⑤in[i]が1ならば、in[i-1]をNOTしてout[i]にロード
+⑥in[i]が1でなければ、in[i-1]をout[i]にロード
+⑦iをインクリメント
+⑧i<(inのサイズ)であれば⑤に飛ぶ
+*/
+
+/* 2025/01/13/14:27:実装。シフトする回数を調整するのがめんどかったため試験的に8,8(8Bit入力8Bit出力)でのみサポート。 */
+
+uint8_t xor(uint8_t in1, uint8_t in2)
+{
+	int tmp = 0;
+	for(int i = 8; 0 <= i; i--)
+	{
+		tmp += (((in1 >> i) % 2) || ((in2 >> i) % 2)) - (((in1 >> i) % 2) && ((in2 >> i) % 2));
+		if(i != 0)
+		tmp <<= 1;
+	}
+	return tmp;
+}
+
+dllexp uint8_t xea(uint8_t p)
+{
+	uint8_t result = 0;
+
+	result = ((p >> 7) % 2) << 7;
+
+	for(int i = 6; 0 <= i; i--)
+	{
+		result += xor((p >> (i + 1)) % 2, (p >> i) % 2) << i;
+	}
+	return result;
+}
+
+dllexp uint8_t xda(uint8_t p)
+{
+	uint8_t result = 0;
+
+	result = ((p >> 7) % 2);
+	result <<= 1;
+
+	for(int i = 6; 0 <= i; i--)
+	{
+		if(!((p >> i) % 2))
+		result += (result >> 1) % 2;
+		else
+		result += ((result >> 1) + 1) % 2;
+		
+		if(0 < i)
+		result <<= 1;
+	}
+
+	return result;
+}
+
+dllexp unsigned int dec2bin(unsigned int p)
+{
+	/* 2025/01/13/12:10:実装。入力pに対して、二進表記の結果を10進数で返す。 */
+	/* 見かけ上は2進数だが、実際は10進数として認識されることに注意。 */
+	/* また変換可能な値の範囲は0-1023であることにも注意。 */
+	unsigned int tmp = p;
+	int sbr = 1;
+	int counter = 0;
+	unsigned int result = 0;
+
+	while(p != 0)
+	{
+		tmp = p;
+		sbr = 1;
+		counter = 0;
+
+		while(tmp != 1)
+		{
+			tmp >>= 1;
+			sbr <<= 1;
+			counter++;
+		}
+		p -= sbr;
+		tmp = 1;
+
+		for(int i = 0; i < counter; i++)
+		{
+			tmp = tmp * 10;
+		}
+		result += tmp;
+	}
+
+	return result;
 }
 
 dllexp void msgtype(int tablenum)
