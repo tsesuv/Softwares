@@ -87,9 +87,9 @@ int setbclr(int cc)
 	return 0;
 }
 
-int setstyle(int sid)
+int setstyle(int sc)
 {
-	switch(sid)
+	switch(sc)
 	{
 		case 0:
 			break;
