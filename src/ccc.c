@@ -12,8 +12,9 @@ int setmode(int);
 
 int setcclr(int);
 int setbclr(int);
+int setstyle(int);
 
-int resetclr(void);
+int resettxt(int);
 
 int getrow(void);
 int getcol(void);
@@ -86,9 +87,52 @@ int setbclr(int cc)
 	return 0;
 }
 
-int resetclr(void)
+int setstyle(int sid)
 {
-	printf("\x1b[0m");
+	switch(sid)
+	{
+		case 0:
+			break;
+
+		case 1: // Bold
+			printf("\x1b[1m");
+			break;
+
+		case 2: // Italic
+			printf("\x1b[3m");
+			break;
+
+		case 3: // Under line
+			printf("\x1b[4m");
+			break;
+
+		case 4: // flush
+			printf("\x1b[5m");
+			break;
+
+		case 5: // Switch f/b color
+			printf("\x1b[7m");
+			break;
+	}
+	return 0;
+}
+
+int resettxt(int mode)
+{
+	switch(mode)
+	{
+		case 0:
+			printf("\x1b[0m");
+			break;
+
+		case 1:
+			printf("\x1b[39m");
+			break;
+
+		case 2:
+			printf("\x1b[49m");
+			break;
+	}
 
 	return 0;
 }
