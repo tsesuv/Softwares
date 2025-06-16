@@ -31,8 +31,9 @@ int setmode(int);
 
 int setcclr(int);
 int setbclr(int);
+int setstyle(int);
 
-int resetclr(void);
+int resettxt(int);
 
 int getrow(void);
 int getcol(void);
