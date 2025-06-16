@@ -23,6 +23,12 @@
 #define CYAN 6
 #define WHITE 7
 
+#define BOLD 1
+#define ITALIC 2
+#define ULINE 3
+#define FLUSH 4
+#define SWITCH 5
+
 ////////////////////////////////////////////////////////
 
 int cls(void);
