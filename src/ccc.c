@@ -93,6 +93,30 @@ int resetclr(void)
 	return 0;
 }
 
+int getrow(void)
+{
+	struct winsize ws;
+
+	if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1)
+	{
+		return -1;
+	}
+
+	return ws.ws_row;
+}
+
+int getcol(void)
+{
+	struct winsize ws;
+
+	if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1)
+	{
+		return -1;
+	}
+
+	return ws.ws_col;
+}
+
 int getposx(void)
 {
 	struct timeval tv = {0, 200000};
@@ -167,30 +191,6 @@ int getposy(void)
 	return -1;
 }
 
-int getrow(void)
-{
-	struct winsize ws;
-
-	if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1)
-	{
-		return 0;
-	}
-
-	return ws.ws_row;
-}
-
-int getcol(void)
-{
-	struct winsize ws;
-
-	if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1)
-	{
-		return 0;
-	}
-
-	return ws.ws_col;
-}
-
 int acs(int x, int y)
 {
 	if(((x < 0) || (getcol() < x)) || ((y < 0) || (getrow() < y)))
@@ -212,9 +212,9 @@ int rcs(int dx, int dy)
 	}
 	else
 	{
-		acs(x + dx, y + dy);
+		int val = acs(x + dx, y + dy);
 		fflush(stdout);
-		return 0;
+		return val;
 	}
 }
 
