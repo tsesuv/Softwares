@@ -11,6 +11,9 @@
 #include <sys/ioctl.h>
 #include <sys/select.h>
 #include <sys/time.h>
+
+////////////////////////////////////////////////////////
+
 #define BLACK 0
 #define RED 1
 #define GREEN 2
