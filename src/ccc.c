@@ -24,8 +24,8 @@ int getposy(void);
 int acs(int, int);
 int rcs(int, int);
 
-int bprint(const char *text, ...);
-int bprintln(const char *text, ...);
+int bprint(const char *, ...);
+int bprintln(const char *, ...);
 
 int box(int, int, int, int);
 
