@@ -35,6 +35,8 @@ cccには次の関数が用意されています。なお、カーソルの位�
   文字列`text`を出力します。printfのラッパー関数です。文字列出力後、カーソルの位置を出力直前の位置に戻します。
 ・int bprintln(const char *text, ...)
   文字列`text`を出力します。printfのラッパー関数です。文字列出力後、カーソルの位置を出力直前の位置の1行下に戻します。
+・int box(int sx, int sy, int ex, int ey)
+  sx, syからex, eyまでの一にボックスを描きます。
 ・int kbhit(void)
   キーボードが押されたかどうかを検出します。キーの種類は調べません。押されている場合は1を、押されていない場合は0を返します。
 ・int csloff(int mode)
