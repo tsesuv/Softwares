@@ -27,6 +27,8 @@ int rcs(int, int);
 int bprint(const char *text, ...);
 int bprintln(const char *text, ...);
 
+int box(int, int, int, int);
+
 int kbhit(void);
 int csloff(int);
 
@@ -289,6 +291,52 @@ int bprintln(const char *text, ...)
 	va_end(ap);
 
 	acs(bakx, baky + 1);
+
+	return 0;
+}
+
+int box(int sx, int sy, int ex, int ey)
+{
+	int bx = getposx();
+	int by = getposy();
+
+	acs(sx, sy);
+
+	bprintln("+");
+
+	for(int i = 0; i < ex - 1; i++)
+	{
+		bprintln("|");
+	}
+
+	bprint("+");
+
+	acs(sx + 1, sy);
+
+	for(int i = 0; i < ey - 1; i++)
+	{
+		printf("-");
+	}
+
+	printf("+");
+
+	acs(ex, sy + 1);
+
+	for(int i = 0; i < ex - 1; i++)
+	{
+		bprintln("|");
+	}
+
+	acs(sx + 1, ey);
+
+	for(int i = 0; i < ey - 1; i++)
+	{
+		printf("-");
+	}
+
+    printf("+");
+
+	acs(bx, by);
 
 	return 0;
 }
