@@ -19,7 +19,6 @@ dllexp char *slice(char *p, int si, int ei);
 dllexp char *swap(char *p);
 dllexp char *unique(char *p);
 dllexp void sort(int *p, int l);
-dllexp void twss(int *p, int l);
 dllexp unsigned long long dec2bin(unsigned long long p);
 dllexp unsigned long long bin2dec(unsigned long long p);
 dllexp unsigned long long *dip(unsigned long long p);
@@ -61,7 +60,7 @@ dllexp char *rewrite(char *p, int i, char d)
 		if (memsize <= k)
 		{
 			memsize++;
-			char *tmp = (char *)realloc(res_list, memsize * sizeof(char *));
+			char *tmp = (char *)realloc(res_list, memsize * sizeof(char));
 			if (!tmp)
 			{
 				free(res_list);
@@ -107,7 +106,7 @@ dllexp char *trim(char *p, int i)
 		if (memsize <= k)
 		{
 			memsize++;
-			char *tmp = (char *)realloc(res_list, memsize * sizeof(char *));
+			char *tmp = (char *)realloc(res_list, memsize * sizeof(char));
 			if (!tmp)
 			{
 				free(res_list);
@@ -153,7 +152,7 @@ dllexp char *find(char *p, char tgt)
 		if (memsize <= k)
 		{
 			memsize++;
-			char *tmp = (char *)realloc(res_list, memsize * sizeof(char *));
+			char *tmp = (char *)realloc(res_list, memsize * sizeof(char));
 			if (!tmp)
 			{
 				free(res_list);
@@ -311,16 +310,6 @@ dllexp char *unique(char *p)
 
 dllexp void sort(int *p, int l)
 {
-	twss(p, l);
-	return;
-}
-
-dllexp void twss(int *p, int l)
-{
-	/* 2024/12/14/21:14:このアルゴリズムの名前が「双方向選択ソート」、
-	英語では「Two Way Selection Sort」になったため、関数名をtwssとさせていただきました。
-	なお、既存のプログラムでの利用でエラーが起きないよう、
-	sort関数ではtwssを呼び出すよう変更しております。 */
 	int tmp; // 値のコピー用
 	/* 2025/01/26/14:21:やっぱりtwssに関しては長さは明示的に指定するほうがいい気がするので戻してみました。 */
 	int i = 0;
