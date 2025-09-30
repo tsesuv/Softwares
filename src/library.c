@@ -152,7 +152,7 @@ dllexp char *split(char *p, char dchar, int i)
 		l++;
 		memsize++;
 	}
-	if(0 < memsize) char *res_list = (char *)malloc(memsize - 1);
+	char *res_list = (char *)malloc(memsize);
 	if(!res_list) return NULL;
 
 	for(int m = 0; m < l; m++) *(res_list + m) = 0;
@@ -211,7 +211,7 @@ dllexp char *swap(char *p)
 		l++;
 		memsize++;
 	}
-	char *res_list = (char *)malloc(memsize - 1);
+	char *res_list = (char *)malloc(memsize);
 
 	for(int i = 0; i < l; i++)
 	{
@@ -230,7 +230,7 @@ dllexp char *unique(char *p)
 		l++;
 		memsize++;
 	}
-	char *res_list = (char *)malloc(memsize - 1);
+	char *res_list = (char *)malloc(memsize);
 
 	for(int i = 0; i < l; i++)
 	{
