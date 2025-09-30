@@ -3,7 +3,7 @@
 #else
 #define dllexp /*extern __declspec(dllexport)*/
 #endif
-#define TABLE_SIZE (2 < 16)
+#define TABLE_SIZE (2 << 16)
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
@@ -19,8 +19,6 @@ dllexp char *slice(char *p, int si, int ei);
 dllexp char *swap(char *p);
 dllexp char *unique(char *p);
 dllexp void sort(int *p, int l);
-dllexp unsigned long long dec2bin(unsigned long long p);
-dllexp unsigned long long bin2dec(unsigned long long p);
 dllexp unsigned long long *dip(unsigned long long p);
 dllexp int SetVarData(const char *VarName, const char *VarData);
 dllexp void *GetVarData(const char *VarName);
@@ -32,6 +30,8 @@ dllexp void tag(int tablenum);
 関数の返り値を使用する方式に変更するため、
 変数をグローバルとして宣言。65535文字までなら何とか。 */
 /* 配列を使用するすべての関数において動的メモリ化が完了したため、各関数内でres_listを宣言する形に戻しました。 */
+
+/* 2025/09/30/16:48:全体的にフォーマットを修正したりしました。コメントのフォーマットを統一したりコード内の無意味な文字を消したり・・・ */
 
 typedef struct
 {
@@ -48,31 +48,23 @@ dllexp char *rewrite(char *p, int i, char d)
 
 	int memsize = 1;
 	char *res_list = (char *)malloc(memsize); /* 2025/01/13/07:56:試験的に動的メモリを使用するようにしました。 */
-	if (!res_list)
-	{
-		free(res_list);
-		return NULL;
-	}
+	if(!res_list) return NULL;
+	
 	int k = 0;
 
-	while (*(p + k) != '\0')
+	while(*(p + k) != '\0')
 	{
-		if (memsize <= k)
+		if(memsize <= k)
 		{
 			memsize++;
 			char *tmp = (char *)realloc(res_list, memsize * sizeof(char));
-			if (!tmp)
-			{
-				free(res_list);
-				free(tmp);
-				return NULL;
-			}
+			if(!tmp) return NULL;
 
 			res_list = tmp;
 		}
 
 		*(res_list + k) = *(p + k); /* 2024/12/19/09:40:バグがあったので修正 */
-		if (k == i)
+		if(k == i)
 		{
 			*(res_list + k) = d;
 		}
@@ -80,7 +72,6 @@ dllexp char *rewrite(char *p, int i, char d)
 	}
 	*(res_list + k) = '\0';
 	return res_list;
-	free(res_list);
 }
 
 dllexp char *trim(char *p, int i)
@@ -88,49 +79,30 @@ dllexp char *trim(char *p, int i)
 	/* 2024/12/07/12:49:入力配列pを破壊しないように変更しました */
 	int memsize = 1;
 	char *res_list = (char *)malloc(memsize);
-	if (!res_list)
-	{
-		free(res_list);
-		return NULL;
-	}
+	if(!res_list) return NULL;
+	
 	int k = 0;
 	int l = 0;
 
-	while (*(p + l) != '\0')
-	{
-		l++;
-	}
+	while(*(p + l) != '\0') l++;
 
-	while (*(p + k) != '\0')
+	while(*(p + k) != '\0')
 	{
-		if (memsize <= k)
+		if(memsize <= k)
 		{
 			memsize++;
 			char *tmp = (char *)realloc(res_list, memsize * sizeof(char));
-			if (!tmp)
-			{
-				free(res_list);
-				free(tmp);
-				return NULL;
-			}
+			if(!tmp) return NULL;
+			
 			res_list = tmp;
 		}
 
-		if (i <= k)
+		if(i <= k)
 		{
-			if (k == l - 1)
-			{
-				*(res_list + k) = '\0';
-			}
-			else
-			{
-				*(res_list + k) = *(p + k + 1);
-			}
+			if(k == l - 1) *(res_list + k) = '\0';
+			else *(res_list + k) = *(p + k + 1);
 		}
-		else
-		{
-			*(res_list + k) = *(p + k);
-		}
+		else *(res_list + k) = *(p + k);
 	}
 	return res_list;
 }
@@ -139,21 +111,18 @@ dllexp char *find(char *p, char tgt)
 {
 	int memsize = 1;
 	char *res_list = (char *)malloc(memsize);
-	if (!res_list)
-	{
-		free(res_list);
-		return NULL;
-	}
+	if(!res_list) return NULL;
+
 	int k = 0;
 	int i = 0;
 
-	while (*(p + k) != '\0')
+	while(*(p + k) != '\0')
 	{
-		if (memsize <= k)
+		if(memsize <= k)
 		{
 			memsize++;
 			char *tmp = (char *)realloc(res_list, memsize * sizeof(char));
-			if (!tmp)
+			if(!tmp)
 			{
 				free(res_list);
 				free(tmp);
@@ -162,7 +131,7 @@ dllexp char *find(char *p, char tgt)
 			res_list = tmp;
 		}
 
-		if (*(p + k) == tgt)
+		if(*(p + k) == tgt)
 		{
 			*(res_list + i) = k;
 			i++;
@@ -188,46 +157,32 @@ dllexp char *split(char *p, char dchar, int i)
 		memsize++;
 	}
 	char *res_list = (char *)malloc(memsize - 1);
-	if(!res_list)
-	{
-		free(res_list);
-		return NULL;
-	}
-	for(int m = 0; m < l; m++)
-	{
-		*(res_list + m) = 0;
-	}
+	if(!res_list) return NULL;
+
+	for(int m = 0; m < l; m++) *(res_list + m) = 0;
+
 	char tmp[l + 2];
 
-	for (int ti = 0; ti < l; ti++)
-	{
-		*(tmp + ti + 1) = *(p + ti);
-	}
+	for(int ti = 0; ti < l; ti++) *(tmp + ti + 1) = *(p + ti);
+
 	*(tmp + l + 1) = dchar;
 	*tmp = dchar;
 
-	for (int j = 0; j < l + 2; j++)
+	for(int j = 0; j < l + 2; j++)
 	{
-		if (*(tmp + j) == dchar)
+		if(*(tmp + j) == dchar)
 		{
 			k++;
-			if (k - 1 == i)
+			if(k - 1 == i)
 			{
 				j++;
-				while (1)
+				while(1)
 				{
-					if (k - 1 == i + 1)
-					{
-						return res_list;
-					}
-					if (*(tmp + j) == dchar)
-					{
-						k++;
-					}
-					else
-					{
-						*(res_list + n) = *(tmp + j);
-					}
+					if(k - 1 == i + 1) return res_list;
+
+					if(*(tmp + j) == dchar) k++;
+					else *(res_list + n) = *(tmp + j);
+					
 					n++;
 					j++;
 				}
@@ -240,16 +195,12 @@ dllexp char *split(char *p, char dchar, int i)
 dllexp char *slice(char *p, int si, int ei)
 {
 	int l = 0;
-	while(*(p + l) != '\0')
-	{
-		l++;
-	}
+	while(*(p + l) != '\0') l++;
+	
 	char tmp[l + 2];
 
-	for (int i = 0; i < l; i++)
-	{
-		*(tmp + i + 1) = *(p + i);
-	}
+	for(int i = 0; i < l; i++) *(tmp + i + 1) = *(p + i);
+	
 	*(tmp + ei + 1) = 0x01;
 	*(tmp + si) = 0x01;
 	return split(tmp, 0x01, 1);
@@ -266,7 +217,7 @@ dllexp char *swap(char *p)
 	}
 	char *res_list = (char *)malloc(memsize - 1);
 
-	for (int i = 0; i < l; i++)
+	for(int i = 0; i < l; i++)
 	{
 		*(res_list + i) = *(p + l - i - 1);
 	}
@@ -285,21 +236,21 @@ dllexp char *unique(char *p)
 	}
 	char *res_list = (char *)malloc(memsize - 1);
 
-	for (int i = 0; i < l; i++)
+	for(int i = 0; i < l; i++)
 	{
 		/* 2024/12/06/21:21:修正完了。もともとのコードは消しました。 */
 		/* n番目の要素と*(p + i)が一致したらflagを1にする、forする前に0にして置き、forし終わった後にflag==0ならres_list[k]に追加、k++をする */
 		int flag = 0;
-		for (int n = 0; n < l; n++)
+		for(int n = 0; n < l; n++)
 		{
-			if (*(p + i) == *(res_list + n))
+			if(*(p + i) == *(res_list + n))
 			{
 				flag = 1;
 				break; // AIの指摘により、「flagを立てたら、そのあとは調べるの無意味じゃない？」ということでforから抜けるように。
 			}
 		}
 
-		if (flag == 0)
+		if(!flag)
 		{
 			*(res_list + k) = *(p + i);
 			k++;
@@ -311,14 +262,14 @@ dllexp char *unique(char *p)
 dllexp void sort(int *p, int l)
 {
 	int tmp; // 値のコピー用
-	/* 2025/01/26/14:21:やっぱりtwssに関しては長さは明示的に指定するほうがいい気がするので戻してみました。 */
+	/* 2025/01/26/14:21:やっぱりsortに関しては長さは明示的に指定するほうがいい気がするので戻してみました。 */
 	int i = 0;
 	int k = l - 1;
 
 	/* 2025/01/26/14:26:AIの指摘により、whileループの条件のほうでループを抜けるようにしました。 */
-	while (i < l - 1)
+	while(i < l - 1)
 	{
-		if (*(p + i) > *(p + k))
+		if(*(p + k) < *(p + i))
 		{
 			tmp = *(p + i);
 			*(p + i) = *(p + k);
@@ -326,7 +277,7 @@ dllexp void sort(int *p, int l)
 		}
 		k--;
 
-		if (i == k)
+		if(i == k)
 		{
 			i++;
 			k = l - 1;
@@ -335,62 +286,9 @@ dllexp void sort(int *p, int l)
 	return;
 }
 
-dllexp unsigned long long dec2bin(unsigned long long p)
-{
-	/* 2025/01/13/12:10:実装。入力pに対して、二進表記の結果を10進数で返す。 */
-	/* 見かけ上は2進数だが、実際は10進数として認識されることに注意。 */
-	/* また変換可能な値の範囲は0-1023であることにも注意。 */
-	/* 2025/02/13/19:37:0-1048575に拡張。 */
-	unsigned long long tmp = p;
-	unsigned int sbr = 1;
-	unsigned int counter = 0;
-	unsigned long long result = 0;
-
-	while (p != 0)
-	{
-		tmp = p;
-		sbr = 1;
-		counter = 0;
-
-		while (tmp != 1)
-		{
-			tmp >>= 1;
-			sbr <<= 1;
-			counter++;
-		}
-		p -= sbr;
-		tmp = 1;
-
-		for (int i = 0; i < counter; i++)
-		{
-			tmp *= 10;
-		}
-		result += tmp;
-	}
-
-	return result;
-}
-
-dllexp unsigned long long bin2dec(unsigned long long p)
-{
-	/* 2025/02/13/19:10:実装。'dec2bin`による見かけ上の2進数を10進数に変換。 */
-	/* 2025/02/13/19:37:0-1048575に拡張。 */
-	unsigned long long result = 0;
-	unsigned int k = 0;
-	while(p != 0)
-	{
-		if((p % 10) == 1)
-		{
-			result += (1 << k);
-		}
-		p /= 10;
-		k++;
-	}
-	return result;
-}
-
 dllexp uint8_t chr2int(const char *p)
 {
+	/* 2025/09/30/16:46:charとしての数字列をintとしての数値に変換する */
 	int result = 0;
 	int i = 0;
 	while(*(p + i) != 0)
@@ -404,27 +302,20 @@ dllexp uint8_t chr2int(const char *p)
 
 dllexp unsigned long long *dip(unsigned long long p)
 {
-	/*2025/01/11/21:01:実装。8Byte整数を素因数分解する。*/
+	/* 2025/01/11/21:01:実装。8Byte整数を素因数分解する。 */
 
 	unsigned long long k = 0;
 	unsigned long long i = 2;
 	unsigned long long memsize = 1;
 	unsigned long long *result = (unsigned long long *)malloc(memsize * sizeof(unsigned long long));
-	if(!result)
-	{
-		free(result);
-		return NULL;
-	}
+	if(!result) return NULL;
 
 	if(p == 1)
 	{
 		*result = 1;
 		return result;
 	}
-	else if(p == 0)
-	{
-		return NULL;
-	}
+	else if(p == 0) return NULL;
 
 	while(p != 1)
 	{
@@ -432,12 +323,8 @@ dllexp unsigned long long *dip(unsigned long long p)
 		{
 			memsize++;
 			unsigned long long *tmp = (unsigned long long *)realloc(result, memsize * sizeof(unsigned long long));
-			if(!tmp)
-			{
-				free(tmp);
-				free(result);
-				return NULL;
-			}
+			if(!tmp) return NULL;
+			
 			result = tmp;
 		}
 
@@ -496,24 +383,24 @@ dllexp void tag(int tablenum)
 {
 	switch (tablenum)
 	{
-	case 0:
-		printf("\e[40m \e[41m \e[42m \e[43m \e[44m \e[45m \e[46m \e[47m \e[0m");
-		break;
-	case 1:
-		printf("\e[42m[\e[30m INFO ]\e[0m ");
-		break;
-	case 2:
-		printf("\e[41m[\e[38m ERROR ]\e[0m ");
-		break;
-	case 3:
-		printf("\e[43m[\e[30m WARNING ]\e[0m "); /* 2024/12/19/06:07:スペルミス発覚。どんなミスしてんねん。 */
-		break;
-	case 4:
-		printf("\e[44m[\e[30m DEBUG ]\e[0m ");
-		break;
-	case 5:
-		printf("\e[46m[\e[30m NOTE ]\e[0m ");
-		break;
+		case 0:
+			printf("\e[40m \e[41m \e[42m \e[43m \e[44m \e[45m \e[46m \e[47m \e[0m");
+			break;
+		case 1:
+			printf("\e[42m[\e[30m INFO ]\e[0m ");
+			break;
+		case 2:
+			printf("\e[41m[\e[38m ERROR ]\e[0m ");
+			break;
+		case 3:
+			printf("\e[43m[\e[30m WARNING ]\e[0m "); /* 2024/12/19/06:07:スペルミス発覚。どんなミスしてんねん。 */
+			break;
+		case 4:
+			printf("\e[44m[\e[30m DEBUG ]\e[0m ");
+			break;
+		case 5:
+			printf("\e[46m[\e[30m NOTE ]\e[0m ");
+			break;
 	}
 	return;
 }
