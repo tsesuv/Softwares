@@ -122,12 +122,8 @@ dllexp char *find(char *p, char tgt)
 		{
 			memsize++;
 			char *tmp = (char *)realloc(res_list, memsize * sizeof(char));
-			if(!tmp)
-			{
-				free(res_list);
-				free(tmp);
-				return NULL;
-			}
+			if(!tmp) return NULL;
+			
 			res_list = tmp;
 		}
 
@@ -156,7 +152,7 @@ dllexp char *split(char *p, char dchar, int i)
 		l++;
 		memsize++;
 	}
-	char *res_list = (char *)malloc(memsize - 1);
+	if(0 < memsize) char *res_list = (char *)malloc(memsize - 1);
 	if(!res_list) return NULL;
 
 	for(int m = 0; m < l; m++) *(res_list + m) = 0;
