@@ -23,7 +23,9 @@ wrd chr2wrd(chr rid);
 chr wrd2chr(wrd w);
 chr getSid(wrd w);
 chr getCid(wrd w);
-wrd suffle(wrd *list,  chr *hLen, chr lLen);
+chr getSch(wrd w);
+chr getCch(wrd w);
+wrd suffle(wrd *list,  chr len);
 
 chr winit(wrd *w, chr len)
 {	if(!w)
@@ -62,59 +64,97 @@ chr getCid(wrd w)
 {	return w.b;
 }
 
-wrd suffle(wrd *list, chr *hLen, chr lLen)
-{	if(54 < lLen)
-		return (wrd){5, 0};
+chr getSch(wrd w)
+{	switch(getSid(w))
+	{	case 0:
+			return 'c';
 
-	uint chk = 0;
-	if(list || hLen)
-	{	for(uint i = 0; i < lLen; i++)
-			chk += hLen[i];
+		case 1:
+			return 'd';
+
+		case 2:
+			return 'h';
+
+		case 3:
+			return 's';
+
+		case 4:
+			return 'r';
+
+		default:
+			return 1;
+	}
+}
+
+chr getCch(wrd w)
+{	if(getSid(w) < 4)
+	{	switch(getCid(w))
+		{	case 0:
+				return 'A';
 	
-		if(54 < chk)
-			return (wrd){5, 1};
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+				return 0x31 + getCid(w);
+	
+			case 9:
+				return 'X';
+	
+			case 10:
+				return 'J';
+	
+			case 11:
+				return 'Q';
+	
+			case 12:
+				return 'K';
+
+			default:
+				return 1;
+		}
+	} else
+	{	if(getCid(w) == 0)
+			return '0';
+
+		else if(getCid(w) == 1)
+			return '1';
+
+		else
+			return 2;
+	}
+}
+
+wrd suffle(wrd *list, chr len)
+{	wrd w;
+	chr f = 0;
+	chr x = 0;
+	chr i = 0;
+
+	if(!list)
+	{	w = chr2wrd(rand() % 54);
+
+		return w;
 	}
 
-	wrd w;
-	chr tmp = 55;
-	chr *uList = malloc(55 - chk);
-	chr *fList = malloc(54);
+	while(1)
+	{	w = chr2wrd(rand() % 54);
 
-	if(!list || !hLen)
-		tmp = rand() % 54;
+		for(i = 0; i < len; i++)
+		{	if(wrd2chr(list[i]) == wrd2chr(w))
+				break;
+		} if(len <= i) return w;
 
-	else
-	{	uint n = 0;
-		for(uint k = 0; k < 5; k++)
-		{	for(uint i = 0; i < (k < 4 ? 13 : 2); i++)
-			{	if(k < lLen)
-				{	if(i < hLen[k])
-						fList[13 * k + i] = wrd2chr(list[n++]);
-	
-					else
-						fList[13 * k + i] = 55;
-				} else
-					fList[13 * k + i] = 55;
-			}
-		}
-	
-		n = 0;
-		for(uint k = 0; k < 5; k++)
-		{	for(uint i = 0; i < (k < 4 ? 13 : 2); i++)
-			{	if(fList[13 * k + i] == 55)
-					uList[n++] = 13 * k + i;
-			}
-		}
+		if(100 * len < x)
+		{	w = chr2wrd(56);
 
-		tmp = uList[rand() % (55 - chk)];
+			return w;
+		} x++;
 	}
-
-	w = chr2wrd(tmp);
-
-	free(fList);
-	free(uList);
-
-	return w;
 }
 
 #endif /* trump.h */
