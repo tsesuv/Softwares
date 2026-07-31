@@ -66,9 +66,9 @@ wrd suffle(wrd *list, chr *hLen, chr lLen)
 {	if(54 < lLen)
 		return (wrd){5, 0};
 
+	uint chk = 0;
 	if(list || hLen)
-	{	uint chk = 0;
-		for(uint i = 0; i < lLen; i++)
+	{	for(uint i = 0; i < lLen; i++)
 			chk += hLen[i];
 	
 		if(54 < chk)
@@ -77,7 +77,7 @@ wrd suffle(wrd *list, chr *hLen, chr lLen)
 
 	wrd w;
 	chr tmp = 55;
-	chr *uList = malloc(54 - lLen);
+	chr *uList = malloc(55 - lLen);
 	chr *fList = malloc(54);
 
 	if(!list || !hLen)
@@ -99,20 +99,14 @@ wrd suffle(wrd *list, chr *hLen, chr lLen)
 		}
 	
 		n = 0;
-		chr f[54] = {0};
 		for(uint k = 0; k < 5; k++)
 		{	for(uint i = 0; i < (k < 4 ? 13 : 2); i++)
 			{	if(fList[13 * k + i] != 55)
-					f[13 * k + i] = 1;
-			}
-	
-			for(uint i = 0; i < (k < 4 ? 13 : 2); i++)
-			{	if(!f[13 * k + i])
 					uList[n++] = 13 * k + i;
 			}
 		}
 
-		tmp = uList[rand() % (54 - lLen)];
+		tmp = uList[rand() % (55 - chk)];
 	}
 
 	w = chr2wrd(tmp);
