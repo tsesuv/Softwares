@@ -77,7 +77,7 @@ wrd suffle(wrd *list, chr *hLen, chr lLen)
 
 	wrd w;
 	chr tmp = 55;
-	chr *uList = malloc(55 - lLen);
+	chr *uList = malloc(55 - chk);
 	chr *fList = malloc(54);
 
 	if(!list || !hLen)
