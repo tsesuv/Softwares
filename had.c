@@ -3,17 +3,30 @@
 
 int main(void)
 {	rinit();
-	wrd w[54];
-	chr l[1];
+	wrd my = chr2wrd(55);
+	wrd dlr = chr2wrd(55);
+	chr input = 0;
+	chr res = 'l';
 
-	winit((wrd *)&w, 54);
+	my = suffle(NULL, 1);
+	dlr = suffle(&my, 1);
 
-	w[0] = suffle(NULL, NULL, 1);
-	for(chr i = 1; i < 54; i++)
-	{	l[0] = i;
+	if(wrd2chr(my) < wrd2chr(dlr))
+		res = 'h';
 
-		w[i] = suffle(w, l, 1);
-		printf("%d#%d\n", getSid(w[i]), getCid(w[i]));
+	printf("High or Low (h/l)? ");
+	scanf("%c", &input);
+
+	if(input == res)
+	{	printf("You win\n");
+
+		printf("Your   card: %c%c\n", getSch(my), getCch(my));
+		printf("Dealer card: %c%c\n", getSch(dlr), getCch(dlr));
+	} else
+	{	printf("You lose\n");
+
+		printf("Your   card: %c%c\n", getSch(my), getCch(my));
+		printf("Dealer card: %c%c\n", getSch(dlr), getCch(dlr));
 	}
 
 	return 0;
