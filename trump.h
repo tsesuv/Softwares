@@ -101,7 +101,7 @@ wrd suffle(wrd *list, chr *hLen, chr lLen)
 		n = 0;
 		for(uint k = 0; k < 5; k++)
 		{	for(uint i = 0; i < (k < 4 ? 13 : 2); i++)
-			{	if(fList[13 * k + i] != 55)
+			{	if(fList[13 * k + i] == 55)
 					uList[n++] = 13 * k + i;
 			}
 		}
